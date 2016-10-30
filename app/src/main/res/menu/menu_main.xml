@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="co.carlosandresjimenez.android.myshareimageexample.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_sendmail"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_sendmail"
         app:showAsAction="never" />
 </menu>

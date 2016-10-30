@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 0;
     private static final int SEND_MAIL_REQUEST = 1;
+
+    private static final String STATE_URI = "STATE_URI";
 
     private ImageView mImageView;
     private TextView mTextView;
@@ -48,13 +51,41 @@ public class MainActivity extends AppCompatActivity {
         mTextView = (TextView) findViewById(R.id.image_uri);
         mImageView = (ImageView) findViewById(R.id.image);
 
+        ViewTreeObserver viewTreeObserver = mImageView.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mImageView.setImageBitmap(getBitmapFromUri(mUri));
+            }
+        });
+
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sedEmail();
+                openImageSelector();
             }
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mUri != null)
+            outState.putString(STATE_URI, mUri.toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.containsKey(STATE_URI) &&
+                !savedInstanceState.getString(STATE_URI).equals("")) {
+            mUri = Uri.parse(savedInstanceState.getString(STATE_URI));
+            mTextView.setText(mUri.toString());
+        }
     }
 
     @Override
@@ -72,14 +103,15 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sendmail) {
+            sendEmail();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public void openImageSelector(View view) {
+    public void openImageSelector() {
         Intent intent;
 
         if (Build.VERSION.SDK_INT < 19) {
@@ -117,6 +149,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Bitmap getBitmapFromUri(Uri uri) {
+
+        if (uri == null || uri.toString().isEmpty())
+            return null;
 
         // Get the dimensions of the View
         int targetW = mImageView.getWidth();
@@ -163,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sedEmail() {
+    private void sendEmail() {
         if (mUri != null) {
             String subject = "URI Example";
             String stream = "Hello! \n"
@@ -195,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
                     .setAction("Select", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            openImageSelector(view);
+                            openImageSelector();
                         }
                     }).show();
         }
