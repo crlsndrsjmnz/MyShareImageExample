@@ -30,7 +30,7 @@
         android:id="@+id/image"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
         android:layout_below="@id/select_image"/>
 
 </RelativeLayout>
