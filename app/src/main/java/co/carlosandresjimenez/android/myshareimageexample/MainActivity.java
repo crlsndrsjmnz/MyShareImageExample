@@ -51,15 +51,6 @@ public class MainActivity extends AppCompatActivity {
         mTextView = (TextView) findViewById(R.id.image_uri);
         mImageView = (ImageView) findViewById(R.id.image);
 
-        ViewTreeObserver viewTreeObserver = mImageView.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                mImageView.setImageBitmap(getBitmapFromUri(mUri));
-            }
-        });
-
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +76,15 @@ public class MainActivity extends AppCompatActivity {
                 !savedInstanceState.getString(STATE_URI).equals("")) {
             mUri = Uri.parse(savedInstanceState.getString(STATE_URI));
             mTextView.setText(mUri.toString());
+
+            ViewTreeObserver viewTreeObserver = mImageView.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    mImageView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    mImageView.setImageBitmap(getBitmapFromUri(mUri));
+                }
+            });
         }
     }
 
